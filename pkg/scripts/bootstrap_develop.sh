@@ -21,6 +21,7 @@ set -e  # Exit immediately if a command exits with a non-zero status.
 REPOSITORIES="bitmask_client leap_pycommon soledad keymanager leap_mail"
 PACKAGES="leap_pycommon keymanager soledad/common soledad/client soledad/server leap_mail bitmask_client"
 REPOS_ROOT=`pwd`  # Root path for all the needed repositories
+OBFSREP="https://git.torproject.org/pluggable-transports/obfsproxy.git"
 
 PS4=">> " # for debugging
 
@@ -51,6 +52,8 @@ clone_repos() {
         [ ! -d $repo ] && git clone $src/$repo
     done
 
+    [ ! -d obfsproxy ] && git clone $OBFSREP
+
     set +x
     echo "${cc_green}Status: $status done!${cc_normal}"
 }
@@ -65,6 +68,9 @@ checkout_develop(){
         cd $REPOS_ROOT/$repo
         git checkout -f develop
     done
+
+    cd $REPOS_ROOT/obfsproxy
+    git checkout -f master
 
     set +x
     echo "${cc_green}Status: $status done!${cc_normal}"
@@ -108,6 +114,9 @@ setup_develop() {
     status="installing packages"
     echo "${cc_green}Status: $status...${cc_normal}"
     set -x  # show commands
+
+    cd $REPOS_ROOT/obfsproxy
+    python setup.py develop --always-unzip
 
     # do a setup develop in every package
     for package in $PACKAGES; do
