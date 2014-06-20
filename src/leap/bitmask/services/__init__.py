@@ -106,8 +106,20 @@ def download_service_config(provider_config, service_config,
                     anything that implements that interface)
     :type session: requests.sessions.Session
     """
+    api_version = provider_config.get_api_version()
     service_name = service_config.name
+    config_version = service_config.get_config_version(provider_config)
+    service_config.set_config_version(str(config_version))
+    if config_version is None or config_version == 1:
+        config_version = ''
+    else:
+        config_version = '-' + str(config_version)
+
+    logger.debug(config_version)
+
+    #service_json = "{0}-service{1}.json".format(service_name, config_version)
     service_json = "{0}-service.json".format(service_name)
+
     headers = {}
     mtime = get_mtime(os.path.join(util.get_path_prefix(),
                                    "leap", "providers",
@@ -117,12 +129,11 @@ def download_service_config(provider_config, service_config,
     if download_if_needed and mtime:
         headers['if-modified-since'] = mtime
 
-    api_version = provider_config.get_api_version()
-
-    config_uri = "%s/%s/config/%s-service.json" % (
+    config_uri = "%s/%s/config/%s-service%s.json" % (
         provider_config.get_api_uri(),
         api_version,
-        service_name)
+        service_name,
+        config_version)
     logger.debug('Downloading %s config from: %s' % (
         service_name.upper(),
         config_uri))
@@ -181,6 +192,32 @@ class ServiceConfig(BaseConfig):
         """
         leap_assert(self._service_name is not None)
         return self._service_name
+
+    def set_config_version(self, version):
+        """
+        Sets the supported config version.
+
+        :param config_version: the version of the provider definition config
+        supported by the provider.
+        :type config_version: str
+        """
+        self._config_version = version
+
+    def get_config_version(self, provider_config):
+
+        version_config = VersionConfig()
+        configs_json = "configs.json"
+
+        api_version = provider_config.get_api_version()
+        version_config.set_api_version(api_version)
+
+        configs_path = ("leap", "providers", provider_config.get_domain(),
+                                                            configs_json)
+        version_config.load(os.path.join(*configs_path))
+        service_name = self.name
+        service_dict = version_config._safe_get_value(service_name)
+        config_version = max([int(x) for x in service_dict.get('formats')])
+        return config_version
 
 
 class VersionConfig(BaseConfig):

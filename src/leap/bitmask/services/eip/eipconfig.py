@@ -28,6 +28,7 @@ from leap.bitmask.config import flags
 from leap.bitmask.config.providerconfig import ProviderConfig
 from leap.bitmask.services import ServiceConfig
 from leap.bitmask.services.eip.eipspec import get_schema
+from leap.bitmask.services.eip.eipspec_2 import get_schema_2
 from leap.bitmask.util import get_path_prefix
 from leap.common.check import leap_assert, leap_assert_type
 
@@ -48,6 +49,7 @@ def get_eipconfig_path(domain, relative=True):
     leap_assert(domain is not None, "get_eipconfig_path: We need a domain")
 
     path = os.path.join("leap", "providers", domain, "eip-service.json")
+    #path = os.path.join("leap", "providers", domain, "eip-service-2.json")
 
     if not relative:
         path = os.path.join(get_path_prefix(), path)
@@ -77,6 +79,8 @@ def load_eipconfig_if_needed(provider_config, eip_config, domain):
         eip_config_path = get_eipconfig_path(domain)
         api_version = provider_config.get_api_version()
         eip_config.set_api_version(api_version)
+        config_version = eip_config.get_config_version(provider_config)
+        eip_config.set_config_version(config_version)
         loaded = eip_config.load(eip_config_path)
     return loaded
 
@@ -224,6 +228,7 @@ class EIPConfig(ServiceConfig):
         self.standalone = flags.STANDALONE
         ServiceConfig.__init__(self)
         self._api_version = None
+        self._config_version = None
 
     def _get_schema(self):
         """
@@ -231,7 +236,10 @@ class EIPConfig(ServiceConfig):
 
         :rtype: dict or None if the version is not supported.
         """
-        return get_schema(self._api_version)
+        if self._config_version is None or self._config_version == '1':
+            return get_schema(self._api_version)
+        elif self._config_version == '2':
+            return get_schema_2(self._api_version)
 
     def get_clusters(self):
         # TODO: create an abstraction for clusters
@@ -317,7 +325,6 @@ class EIPConfig(ServiceConfig):
             logger.debug("Using OpenVPN cert %s" % (cert_path,))
 
         return cert_path
-
 
 if __name__ == "__main__":
     logger = logging.getLogger(name='leap')
