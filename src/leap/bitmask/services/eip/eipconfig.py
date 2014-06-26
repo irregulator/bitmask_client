@@ -80,7 +80,7 @@ def load_eipconfig_if_needed(provider_config, eip_config, domain):
         api_version = provider_config.get_api_version()
         eip_config.set_api_version(api_version)
         config_version = eip_config.get_config_version(provider_config)
-        eip_config.set_config_version(config_version)
+        eip_config.set_config_version(str(config_version))
         loaded = eip_config.load(eip_config_path)
     return loaded
 
