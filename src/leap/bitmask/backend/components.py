@@ -663,6 +663,8 @@ class EIP(object):
 
         api_version = provider_config.get_api_version()
         eip_config.set_api_version(api_version)
+        config_version = eip_config.get_config_version(provider_config)
+        eip_config.set_config_version(str(config_version))
         eip_loaded = eip_config.load(eipconfig.get_eipconfig_path(domain))
 
         launcher = get_vpn_launcher()
