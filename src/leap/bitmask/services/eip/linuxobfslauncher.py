@@ -54,7 +54,8 @@ class LinuxObfsLauncher(object):
         if obfs_gw['transport'] in 'scramblesuit':
             args.append('--password='+obfs_gw['scramblesuit']['password'])
         args.append('socks')
-        args.append('127.0.0.1:0')
+        #args.append('127.0.0.1:0')
+        args.append('127.0.0.1:9989')
         return args
 
     def spawn_obfs(self, args):
