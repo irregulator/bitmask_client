@@ -1329,6 +1329,7 @@ class MainWindow(QtGui.QMainWindow):
         domain = self._login_widget.get_selected_provider()
         full_user_id = make_address(user, domain)
         self._mail_conductor.userid = full_user_id
+        self._download_version_configs()
         self._start_eip_bootstrap()
         self.ui.action_create_new_account.setEnabled(True)
 
@@ -1342,6 +1343,15 @@ class MainWindow(QtGui.QMainWindow):
 
         if MX_SERVICE not in self._provider_details['services']:
             self._set_mx_visible(False)
+
+    def _download_version_configs(self):
+        """
+        Downloads configs.json, containing versions
+        of services' definitions
+        """
+        self._login_widget.logged_in()
+        domain = self._login_widget.get_selected_provider()
+        self._backend.provider_get_version_configs(domain=domain)
 
     def _start_eip_bootstrap(self):
         """

@@ -30,6 +30,7 @@ from leap.bitmask.config import flags
 from leap.bitmask.config.providerconfig import ProviderConfig, MissingCACert
 from leap.bitmask.provider import get_provider_path
 from leap.bitmask.provider.pinned import PinnedProviders
+from leap.bitmask.services import VersionConfig
 from leap.bitmask.services.abstractbootstrapper import AbstractBootstrapper
 from leap.bitmask.util.constants import REQUEST_TIMEOUT
 from leap.bitmask.util.request_helpers import get_content
@@ -409,3 +410,57 @@ class ProviderBootstrapper(AbstractBootstrapper):
         ]
 
         return self.addCallbackChain(cb_chain)
+
+    def download_version_configs(self, provider_config):
+        """
+        Downloads the json containing versions for
+        provider's service definition file.
+
+        :param provider_config: Provider configuration
+        :type provider_config: ProviderConfig
+        """
+        leap_assert(provider_config, "We need a provider config!")
+        leap_assert_type(provider_config, ProviderConfig)
+
+        configs_json = "configs.json"
+        version_config = VersionConfig()
+        download_if_needed = True
+        headers = {}
+        mtime = get_mtime(os.path.join(util.get_path_prefix(),
+                                        "leap", "providers",
+                                        provider_config.get_domain(),
+                                        configs_json))
+
+        if download_if_needed and mtime:
+            headers['if-modified-since'] = mtime
+
+        api_version = provider_config.get_api_version()
+        version_config.set_api_version(api_version)
+
+        configs_uri = "%s/%s/config/configs.json" % (
+                provider_config.get_api_uri(),
+                api_version)
+
+        logger.debug('Downloading configs.json from: %s' % (configs_uri))
+
+        cookies = None
+        res = self._session.get(configs_uri,
+                         verify=self.verify,
+                         headers=headers,
+                         timeout=REQUEST_TIMEOUT,
+                         cookies=cookies)
+
+        res.raise_for_status()
+
+        configs_path = ("leap", "providers", provider_config.get_domain(),
+                        configs_json)
+
+        if res.status_code == 304:
+            logger.debug("configs.json has not been modified")
+            version_config.load(os.path.join(*configs_path))
+        else:
+            logger.debug("modified")
+            configs_content, mtime = get_content(res)
+            version_config.load(os.path.join(*configs_path),
+                    data=configs_content, mtime=mtime)
+            version_config.save(configs_path)

@@ -24,6 +24,7 @@ import sys
 from PySide import QtCore
 
 from leap.bitmask.config import flags
+from leap.bitmask.config.configs_spec import version_configs_spec
 from leap.bitmask.crypto.srpauth import SRPAuth
 from leap.bitmask.util.constants import REQUEST_TIMEOUT
 from leap.bitmask.util.privilege_policies import is_missing_policy_permissions
@@ -180,3 +181,16 @@ class ServiceConfig(BaseConfig):
         """
         leap_assert(self._service_name is not None)
         return self._service_name
+
+
+class VersionConfig(BaseConfig):
+    """
+    Base class for configs.json
+    """
+    def _get_schema(self):
+        """
+        Returns the schema corresponding to the version given.
+
+        :rtype: dict or None if the version is not supported.
+        """
+        return version_configs_spec
