@@ -87,6 +87,7 @@ class LeapSignaler(SignalerQt):
     prov_problem_with_provider = QtCore.Signal()
     prov_unsupported_api = QtCore.Signal()
     prov_unsupported_client = QtCore.Signal()
+    prov_get_version_configs = QtCore.Signal()
 
     soledad_bootstrap_failed = QtCore.Signal()
     soledad_bootstrap_finished = QtCore.Signal()

@@ -56,6 +56,7 @@ from leap.bitmask.services.soledad.soledadbootstrapper import \
 from leap.bitmask.util import force_eval
 
 from leap.common import certs as leap_certs
+from leap.common.check import leap_assert
 
 from leap.keymanager import openpgp
 from leap.keymanager.errors import KeyAddressMismatch, KeyFingerprintMismatch
@@ -282,6 +283,19 @@ class Provider(object):
         self._signaler.signal(
             self._signaler.prov_get_pinned_providers,
             PinnedProviders.domains())
+
+    def get_version_configs(self, domain):
+        """
+        Downloads configs.json
+        """
+        provider_config = ProviderConfig.get_provider_config(domain)
+        leap_assert(provider_config, "We need a provider configuration!")
+        logger.debug("Downloading configs.json for %s" % domain)
+
+        self._signaler.signal(
+            self._signaler.prov_get_version_configs,
+            self._provider_bootstrapper.download_version_configs(
+                                    provider_config))
 
 
 class Register(object):

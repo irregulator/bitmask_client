@@ -159,6 +159,12 @@ class LeapBackend(Backend):
         """
         self._provider.get_pinned_providers()
 
+    def provider_get_version_configs(self, domain):
+        """
+        Get configs.json from provider
+        """
+        self._provider.get_version_configs(domain)
+
     def user_register(self, provider, username, password):
         """
         Register a user using the domain and password given as parameters.
