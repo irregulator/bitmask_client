@@ -792,14 +792,9 @@ class EIP(object):
             logger.error("Cannot load provider and eip config")
             return False
 
-        try:
-            import obfsproxy
-        except ImportError:
-            launcher = get_obfs_launcher()
-            obfs_path = force_eval(launcher.OBFS_BIN_PATH)
-            if not os.path.isfile(obfs_path):
-                logger.error("Cannot start obfs, binary not found")
-                return False
+        launcher = get_obfs_launcher()
+        if not launcher.obfs_bin_exists():
+            return False
 
         obfs_list = eip_config._safe_get_value("obfsproxies")
 
