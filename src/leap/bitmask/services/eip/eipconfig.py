@@ -123,6 +123,10 @@ class VPNGatewaySelector(object):
         gateways_timezones = []
         locations = self._eipconfig.get_locations()
         gateways = self._eipconfig.get_gateways()
+        # Nasty hack. In eip-service-2.json
+        # gateways are in a dictionary.
+        if isinstance(gateways, dict):
+            gateways = gateways.values()
 
         for idx, gateway in enumerate(gateways):
             gateway_location = gateway.get('location')
@@ -170,6 +174,10 @@ class VPNGatewaySelector(object):
 
         locations = self._eipconfig.get_locations()
         gateways = self._eipconfig.get_gateways()
+        # Nasty hack. In eip-service-2.json
+        # gateways are in a dictionary.
+        if isinstance(gateways, dict):
+            gateways = gateways.values()
 
         for idx, gateway in enumerate(gateways):
             gateway_location = gateway.get('location')
@@ -290,6 +298,10 @@ class EIPConfig(ServiceConfig):
         :rtype: An IPv4Address or IPv6Address object.
         """
         gateways = self.get_gateways()
+        # Nasty hack. In eip-service-2.json
+        # gateways are in a dictionary.
+        if isinstance(gateways, dict):
+            gateways = gateways.values()
         leap_assert(len(gateways) > 0, "We don't have any gateway!")
         if index > len(gateways):
             index = 0
