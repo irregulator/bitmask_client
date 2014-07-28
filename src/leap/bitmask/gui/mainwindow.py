@@ -714,6 +714,8 @@ class MainWindow(QtGui.QMainWindow):
             self._backend.signaler.obfs_can_start
         """
         logger.debug("Starting obfs")
+        domain = self._login_widget.get_selected_provider()
+        self._backend.start_obfs(domain=domain)
         self._maybe_start_eip_with_obfs()
 
     def _backend_cannot_start_obfs(self):

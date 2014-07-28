@@ -42,6 +42,7 @@ API = (
     "keymanager_list_keys",
     "can_start_obfs",
     "obfs_eip_setup",
+    "start_obfs",
     "provider_bootstrap",
     "provider_cancel_setup",
     "provider_get_all_services",

@@ -811,6 +811,35 @@ class EIP(object):
         eb = self._eip_bootstrapper
         eb.eip_setup_for_obfs(provider_config)
 
+    def start_obfs(self, domain):
+        """
+        Start obfs
+        """
+        eip_config = eipconfig.EIPConfig()
+        provider_config = ProviderConfig.get_provider_config(domain)
+
+        api_version = provider_config.get_api_version()
+        eip_config.set_api_version(api_version)
+        config_version = eip_config.get_config_version(provider_config)
+        eip_config.set_config_version(str(config_version))
+        eip_config.load(eipconfig.get_eipconfig_path(domain))
+
+        vpn_gtw_list = eipconfig.VPNGatewaySelector(eip_config).get_gateways()
+        obfs_list = eip_config._safe_get_value("obfsproxies")
+        launcher = get_obfs_launcher()
+
+        if len(obfs_list) > 1:
+            obfs_gw = launcher.pick_obfs_gw(obfs_list, vpn_gtw_list)
+        else:
+            obfs_gw = obfs_list[0]
+
+        args = launcher.get_obfs_args(obfs_gw)
+
+        try:
+            launcher.spawn_obfs(args)
+        except Exception:
+            raise
+
 
 class Soledad(object):
     """
