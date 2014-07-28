@@ -317,6 +317,12 @@ class LeapBackend(Backend):
         """
         self._eip.check_dns(domain)
 
+    def can_start_obfs(self, domain):
+        """
+        Check if we can start obfs client.
+        """
+        self._eip.can_start_obfs(domain)
+
     def tear_fw_down(self):
         """
         Signal the need to tear the fw down.

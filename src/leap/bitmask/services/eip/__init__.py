@@ -23,6 +23,7 @@ import tempfile
 from leap.bitmask.services.eip.darwinvpnlauncher import DarwinVPNLauncher
 from leap.bitmask.services.eip.linuxvpnlauncher import LinuxVPNLauncher
 from leap.bitmask.services.eip.windowsvpnlauncher import WindowsVPNLauncher
+from leap.bitmask.services.eip.linuxobfslauncher import LinuxObfsLauncher
 from leap.bitmask.platform_init import IS_LINUX, IS_MAC, IS_WIN
 from leap.common.check import leap_assert
 
@@ -64,4 +65,17 @@ def get_vpn_launcher():
 
     leap_assert(launcher is not None)
 
+    return launcher()
+
+
+def get_obfs_launcher():
+    """
+    Return the obfs launcher for the current platform.
+    """
+    launcher = None
+
+    if IS_LINUX:
+        launcher = LinuxObfsLauncher
+
+    leap_assert(launcher is not None)
     return launcher()
