@@ -804,6 +804,18 @@ class EIP(object):
 
         return True
 
+    def obfs_eip_setup(self, domain):
+        """
+        Setup EIP configuration prior to obfsproxy
+        launching and independently of VPN process
+
+        :param domain: the domain for the provider to check
+        :type domain: str
+        """
+        provider_config = ProviderConfig.get_provider_config(domain)
+        eb = self._eip_bootstrapper
+        eb.eip_setup_for_obfs(provider_config)
+
 
 class Soledad(object):
     """
