@@ -7,6 +7,7 @@ import logging
 import os
 import random
 import subprocess
+import json
 
 from leap.bitmask.config import flags
 from leap.bitmask.util import force_eval
@@ -63,3 +64,8 @@ class LinuxObfsLauncher(object):
             subprocess.Popen(args, executable=force_eval(self.OBFS_BIN_PATH))
         else:
             subprocess.Popen(args)
+
+    def save_obfs_gw(self, obfs_gw, path):
+        j = json.dumps(obfs_gw)
+        with open(path, 'w') as f:
+            f.write(j)

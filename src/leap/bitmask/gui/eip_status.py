@@ -91,6 +91,8 @@ class EIPStatusWidget(QtGui.QWidget):
 
         self.missing_helpers = False
 
+        self.use_obfs = False
+
         # Action for the systray
         self._eip_disabled_action = QtGui.QAction(
             "{0} is {1}".format(self._service_name, self.tr("disabled")), self)

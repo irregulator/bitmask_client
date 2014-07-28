@@ -22,6 +22,8 @@ import hashlib
 import logging
 import os
 import stat
+import json
+import tempfile
 
 from abc import ABCMeta, abstractmethod
 from functools import partial
@@ -31,7 +33,7 @@ from leap.bitmask.backend.settings import Settings, GATEWAY_AUTOMATIC
 from leap.bitmask.config.providerconfig import ProviderConfig
 from leap.bitmask.platform_init import IS_LINUX
 from leap.bitmask.services.eip.eipconfig import EIPConfig, VPNGatewaySelector
-from leap.bitmask.util import force_eval
+from leap.bitmask.util import force_eval, get_path_prefix
 from leap.common.check import leap_assert, leap_assert_type
 
 
@@ -95,6 +97,18 @@ def _has_other_files(path, warn=True):
     return is_file
 
 
+def _load_obfs_gw(path):
+    with open(path, 'r') as f:
+        d = json.loads(f.readline())
+        return d
+
+
+def _pass_file(obfs_pass):
+    with tempfile.NamedTemporaryFile(delete=False) as tf:
+        tf.write('password\n%s\n' % obfs_pass)
+        return tf.name
+
+
 class VPNLauncher(object):
     """
     Abstract launcher class
@@ -142,7 +156,8 @@ class VPNLauncher(object):
     @classmethod
     @abstractmethod
     def get_vpn_command(kls, eipconfig, providerconfig,
-                        socket_host, socket_port, openvpn_verb=1):
+                        socket_host, socket_port, openvpn_verb=1,
+                        use_obfs=False):
         """
         Return the platform-dependant vpn command for launching openvpn.
 
@@ -192,10 +207,26 @@ class VPNLauncher(object):
         if openvpn_verb is not None:
             args += ['--verb', '%d' % (openvpn_verb,)]
 
-        gateways = kls.get_gateways(eipconfig, providerconfig)
+        if use_obfs:
+            domain = providerconfig.get_domain()
+            path = os.path.join(get_path_prefix(), "leap", "providers",
+                                domain, "obfs_in_use")
+            d = _load_obfs_gw(path)
 
-        for gw in gateways:
-            args += ['--remote', gw, '1194', 'udp']
+            obfs_gw = d['ip_address']
+            if 'scramblesuit' in d['transport']:
+                obfs_port = str(d['scramblesuit']['port'])
+                obfs_pass = d['scramblesuit']['password']
+
+            obfs_pass_file = _pass_file(obfs_pass)
+
+            args += ['--remote', obfs_gw, obfs_port, 'udp']
+            args += ['--socks-proxy', '127.0.0.1', '9999', obfs_pass_file]
+
+        else:
+            gateways = kls.get_gateways(eipconfig, providerconfig)
+            for gw in gateways:
+                args += ['--remote', gw, '1194', 'udp']
 
         args += [
             '--client',

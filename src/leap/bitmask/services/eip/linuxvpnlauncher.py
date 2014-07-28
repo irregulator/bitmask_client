@@ -161,7 +161,8 @@ class LinuxVPNLauncher(VPNLauncher):
 
     @classmethod
     def get_vpn_command(kls, eipconfig, providerconfig, socket_host,
-                        socket_port="unix", openvpn_verb=1):
+                        socket_port="unix", openvpn_verb=1,
+                        use_obfs=False):
         """
         Returns the Linux implementation for the vpn launching command.
 
@@ -188,7 +189,8 @@ class LinuxVPNLauncher(VPNLauncher):
         """
         # we use `super` in order to send the class to use
         command = super(LinuxVPNLauncher, kls).get_vpn_command(
-            eipconfig, providerconfig, socket_host, socket_port, openvpn_verb)
+                eipconfig, providerconfig, socket_host, socket_port,
+                openvpn_verb, use_obfs)
 
         command.insert(0, force_eval(kls.BITMASK_ROOT))
         command.insert(1, "openvpn")

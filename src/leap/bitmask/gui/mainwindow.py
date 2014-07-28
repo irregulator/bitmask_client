@@ -1693,7 +1693,8 @@ class MainWindow(QtGui.QMainWindow):
         """
         Start EIP with obfs
         """
-        pass
+        self._eip_status.use_obfs = True
+        self._maybe_start_eip()
 
     @QtCore.Slot(dict)
     def _finish_eip_bootstrap(self, data):
