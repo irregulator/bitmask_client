@@ -206,7 +206,7 @@ class LeapBackend(Backend):
         """
         self._eip.cancel_setup_eip()
 
-    def eip_start(self, restart=False):
+    def eip_start(self, restart=False, use_obfs=False):
         """
         Start the EIP service.
 
@@ -231,7 +231,7 @@ class LeapBackend(Backend):
         :param restart: whether is is a restart.
         :type restart: bool
         """
-        self._eip.start(restart)
+        self._eip.start(restart, use_obfs)
 
     def eip_stop(self, shutdown=False, restart=False, failed=False):
         """

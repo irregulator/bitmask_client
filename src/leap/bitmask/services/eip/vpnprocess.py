@@ -802,7 +802,7 @@ class VPNProcess(protocol.ProcessProtocol, VPNManager):
     """
 
     def __init__(self, eipconfig, providerconfig, socket_host, socket_port,
-                 signaler, openvpn_verb):
+                 signaler, openvpn_verb, use_obfs):
         """
         :param eipconfig: eip configuration object
         :type eipconfig: EIPConfig
@@ -848,6 +848,7 @@ class VPNProcess(protocol.ProcessProtocol, VPNManager):
 
         self._vpn_observer = VPNObserver(signaler)
         self.is_restart = False
+        self._use_obfs = use_obfs
 
     # processProtocol methods
 
@@ -931,7 +932,8 @@ class VPNProcess(protocol.ProcessProtocol, VPNManager):
             providerconfig=self._providerconfig,
             socket_host=self._socket_host,
             socket_port=self._socket_port,
-            openvpn_verb=self._openvpn_verb)
+            openvpn_verb=self._openvpn_verb,
+            use_obfs=self._use_obfs)
 
         encoding = sys.getfilesystemencoding()
         for i, c in enumerate(command):

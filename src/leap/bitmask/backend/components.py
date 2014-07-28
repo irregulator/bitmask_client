@@ -54,7 +54,7 @@ from leap.bitmask.services.mail.smtpconfig import SMTPConfig
 
 from leap.bitmask.services.soledad.soledadbootstrapper import \
     SoledadBootstrapper
-from leap.bitmask.util import force_eval
+from leap.bitmask.util import force_eval, get_path_prefix
 
 from leap.common import certs as leap_certs
 from leap.common.check import leap_assert
@@ -400,7 +400,7 @@ class EIP(object):
         if d is not None:
             d.cancel()
 
-    def _start_eip(self, restart=False):
+    def _start_eip(self, restart=False, use_obfs=False):
         """
         Start EIP
 
@@ -430,7 +430,7 @@ class EIP(object):
         self._vpn.start(eipconfig=eip_config,
                         providerconfig=provider_config,
                         socket_host=host, socket_port=port,
-                        restart=restart)
+                        restart=restart, use_obfs=use_obfs)
 
     def start(self, *args, **kwargs):
         """
@@ -837,6 +837,10 @@ class EIP(object):
             obfs_gw = launcher.pick_obfs_gw(obfs_list, vpn_gtw_list)
         else:
             obfs_gw = obfs_list[0]
+
+        path = os.path.join(get_path_prefix(), "leap", "providers",
+                            domain, "obfs_in_use")
+        launcher.save_obfs_gw(obfs_gw, path)
 
         args = launcher.get_obfs_args(obfs_gw)
 

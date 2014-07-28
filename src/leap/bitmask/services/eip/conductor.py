@@ -128,6 +128,7 @@ class EIPConductor(object):
         """
         st = self._eip_status
         is_restart = st and st.is_restart
+        use_obfs = st and st.use_obfs
 
         def reconnect():
             self.qtsigs.disconnecting_signal.connect(self._stop_eip)
@@ -147,7 +148,7 @@ class EIPConductor(object):
         self._eip_status.is_restart = False
 
         # DO the backend call!
-        self._backend.eip_start(restart=is_restart)
+        self._backend.eip_start(restart=is_restart, use_obfs=use_obfs)
 
     def reconnect_stop_signal(self):
         """
