@@ -443,6 +443,9 @@ class MainWindow(QtGui.QMainWindow):
         sig.eip_get_gateway_country_code.connect(self._set_eip_provider)
         sig.eip_no_gateway.connect(self._set_eip_provider)
 
+        sig.obfs_can_start.connect(self._backend_can_start_obfs)
+        sig.obfs_cannot_start.connect(self._backend_cannot_start_obfs)
+
         # ==================================================================
 
         # Soledad signals
@@ -703,6 +706,21 @@ class MainWindow(QtGui.QMainWindow):
         else:
             self._eip_status.disable_eip_start()
             self._eip_status.set_eip_status(self.tr("Disabled"))
+
+    def _backend_can_start_obfs(self):
+        """
+        TRIGGER:
+            self._backend.signaler.obfs_can_start
+        """
+        logger.debug("Starting obfs")
+        self._maybe_start_eip_with_obfs()
+
+    def _backend_cannot_start_obfs(self):
+        """
+        TRIGGER:
+            self._backend.signaler.obfs_cannot_start
+        """
+        logger.debug("Cannot start obfs")
 
     @QtCore.Slot()
     def _disable_eip_missing_helpers(self):
@@ -1360,7 +1378,7 @@ class MainWindow(QtGui.QMainWindow):
             self._mail_status.set_disabled()
 
         if self._provides_obfs_and_enabled():
-            self._maybe_start_eip_with_obfs()
+            self._maybe_start_obfs()
         else:
             self._maybe_start_eip()
 
@@ -1399,9 +1417,9 @@ class MainWindow(QtGui.QMainWindow):
         """
 
         # This should check if user wants obfs enabled
-        obfs_enabled = self._eip_status.get_obfs()
+        obfs_user_enabled = self._eip_status.get_obfs()
 
-        return obfs_enabled and self._provides_eip_and_enabled
+        return obfs_user_enabled and self._provides_eip_and_enabled
 
     def _provides_mx_and_enabled(self):
         """
@@ -1652,6 +1670,14 @@ class MainWindow(QtGui.QMainWindow):
                     self._eip_status.set_eip_status(msg)
             # eip will not start, so we start soledad anyway
             self._maybe_run_soledad_setup_checks()
+
+    def _maybe_start_obfs(self):
+        """
+        Backend will check if obfs can be launched
+        """
+
+        domain = self._login_widget.get_selected_provider()
+        self._backend.can_start_obfs(domain=domain)
 
     def _maybe_start_eip_with_obfs(self):
         """

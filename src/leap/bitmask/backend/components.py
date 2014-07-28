@@ -46,6 +46,7 @@ from leap.bitmask.services.eip.eipbootstrapper import EIPBootstrapper
 from leap.bitmask.services.eip import vpnlauncher, vpnprocess
 from leap.bitmask.services.eip import linuxvpnlauncher, darwinvpnlauncher
 from leap.bitmask.services.eip import get_vpn_launcher
+from leap.bitmask.services.eip import get_obfs_launcher
 
 from leap.bitmask.services.mail.imapcontroller import IMAPController
 from leap.bitmask.services.mail.smtpbootstrapper import SMTPBootstrapper
@@ -745,6 +746,61 @@ class EIP(object):
         d = threads.deferToThread(do_check)
         d.addCallback(check_ok)
         d.addErrback(check_err)
+
+    def can_start_obfs(self, domain):
+        """
+        Signal whether it has everything that is needed to run obfsproxy
+        or not
+
+        :param domain: the domain for the provider to check
+        :type domain: str
+
+        Signals:
+            obfs_can_start
+            obfs_cannot_start
+        """
+        if self._can_start_obfs(domain):
+            if self._signaler is not None:
+                self._signaler.signal(self._signaler.obfs_can_start)
+        else:
+            if self._signaler is not None:
+                self._signaler.signal(self._signaler.obfs_cannot_start)
+
+    def _can_start_obfs(self, domain):
+        """
+        Returns True if provider supports obfs proxy,
+        False otherwise
+
+        :param domain: the domain for the provider to check
+        :type domain: str
+        """
+        eip_config = eipconfig.EIPConfig()
+        provider_config = ProviderConfig.get_provider_config(domain)
+
+        api_version = provider_config.get_api_version()
+        eip_config.set_api_version(api_version)
+        config_version = eip_config.get_config_version(provider_config)
+        eip_config.set_config_version(str(config_version))
+        eip_loaded = eip_config.load(eipconfig.get_eipconfig_path(domain))
+
+        if not eip_loaded or provider_config is None:
+            logger.error("Cannot load provider and eip config")
+            return False
+
+        launcher = get_obfs_launcher()
+        obfs_path = force_eval(launcher.OBFS_BIN_PATH)
+        logger.debug(obfs_path)
+        if not os.path.isfile(obfs_path):
+            logger.error("Cannot start obfs, binary not found")
+            return False
+
+        obfs_list = eip_config._safe_get_value("obfsproxies")
+
+        if not any(d for d in obfs_list):
+            logger.error("obfsproxies' list is empty")
+            return False
+
+        return True
 
 
 class Soledad(object):
