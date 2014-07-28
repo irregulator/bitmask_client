@@ -445,6 +445,7 @@ class MainWindow(QtGui.QMainWindow):
 
         sig.obfs_can_start.connect(self._backend_can_start_obfs)
         sig.obfs_cannot_start.connect(self._backend_cannot_start_obfs)
+        sig.obfs_eip_setup.connect(self._check_obfs)
 
         # ==================================================================
 
@@ -1672,6 +1673,13 @@ class MainWindow(QtGui.QMainWindow):
             self._maybe_run_soledad_setup_checks()
 
     def _maybe_start_obfs(self):
+        """
+        EIP files bootstrapping for obfsproxy
+        """
+        domain = self._login_widget.get_selected_provider()
+        self._backend.obfs_eip_setup(domain=domain)
+
+    def _check_obfs(self):
         """
         Backend will check if obfs can be launched
         """

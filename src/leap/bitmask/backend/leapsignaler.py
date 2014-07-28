@@ -91,6 +91,7 @@ class LeapSignaler(SignalerQt):
 
     obfs_can_start = QtCore.Signal()
     obfs_cannot_start = QtCore.Signal()
+    obfs_eip_setup = QtCore.Signal()
 
     soledad_bootstrap_failed = QtCore.Signal()
     soledad_bootstrap_finished = QtCore.Signal()

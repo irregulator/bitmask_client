@@ -122,3 +122,15 @@ class EIPBootstrapper(AbstractBootstrapper):
         ]
 
         return self.addCallbackChain(cb_chain)
+
+    def eip_setup_for_obfs(self, provider_config):
+        """
+        Bootstrap EIP configuration for obfs
+        """
+        self._download_if_needed = True
+        self._provider_config = provider_config
+
+        self._download_config()
+
+        if self._signaler is not None:
+            self._signaler.signal(self._signaler.obfs_eip_setup)
