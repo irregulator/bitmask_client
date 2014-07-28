@@ -629,6 +629,14 @@ class EIPStatusWidget(QtGui.QWidget):
         qtsigs = self.eipconnection.qtsigs
         qtsigs.connection_aborted_signal.emit()
 
+    def get_obfs(self):
+        """
+        Returns the obfs checkbox state
+
+        :rtype: bool
+        """
+        return self.ui.chkObfs.isChecked()
+
     #
     # Slots for signals
     #

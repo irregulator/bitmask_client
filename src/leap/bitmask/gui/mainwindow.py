@@ -1359,7 +1359,10 @@ class MainWindow(QtGui.QMainWindow):
         else:
             self._mail_status.set_disabled()
 
-        self._maybe_start_eip()
+        if self._provides_obfs_and_enabled():
+            self._maybe_start_eip_with_obfs()
+        else:
+            self._maybe_start_eip()
 
     @QtCore.Slot()
     def _get_provider_details(self):
@@ -1384,6 +1387,21 @@ class MainWindow(QtGui.QMainWindow):
         :type details: dict
         """
         self._provider_details = details
+
+    def _provides_obfs_and_enabled(self):
+        """
+        As long as eip is provided and enabled we assume
+        obfsproxy is provided too. We must check if user
+        wants eip over obfs enabled, though.
+
+        :returns:
+        :rtype: bool
+        """
+
+        # This should check if user wants obfs enabled
+        obfs_enabled = self._eip_status.get_obfs()
+
+        return obfs_enabled and self._provides_eip_and_enabled
 
     def _provides_mx_and_enabled(self):
         """
@@ -1634,6 +1652,12 @@ class MainWindow(QtGui.QMainWindow):
                     self._eip_status.set_eip_status(msg)
             # eip will not start, so we start soledad anyway
             self._maybe_run_soledad_setup_checks()
+
+    def _maybe_start_eip_with_obfs(self):
+        """
+        Start EIP with obfs
+        """
+        pass
 
     @QtCore.Slot(dict)
     def _finish_eip_bootstrap(self, data):
