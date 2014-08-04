@@ -221,7 +221,7 @@ class VPNLauncher(object):
             obfs_pass_file = _pass_file(obfs_pass)
 
             args += ['--remote', obfs_gw, obfs_port, 'udp']
-            args += ['--socks-proxy', '127.0.0.1', '9999', obfs_pass_file]
+            args += ['--socks-proxy', '127.0.0.1', '9989', obfs_pass_file]
 
         else:
             gateways = kls.get_gateways(eipconfig, providerconfig)
