@@ -220,7 +220,7 @@ class VPNLauncher(object):
 
             obfs_pass_file = _pass_file(obfs_pass)
 
-            args += ['--remote', obfs_gw, obfs_port, 'udp']
+            args += ['--remote', obfs_gw, obfs_port, 'tcp']
             args += ['--socks-proxy', '127.0.0.1', '9989', obfs_pass_file]
 
         else:
