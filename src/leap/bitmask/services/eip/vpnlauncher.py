@@ -105,7 +105,7 @@ def _load_obfs_gw(path):
 
 def _pass_file(obfs_pass):
     with tempfile.NamedTemporaryFile(delete=False) as tf:
-        tf.write('password\n%s\n' % obfs_pass)
+        tf.write('password=\n%s\n' % obfs_pass)
         return tf.name
 
 
