@@ -848,6 +848,13 @@ class EIP(object):
         except Exception:
             raise
 
+    def stop_obfs(self):
+        """
+        Stop obfsproxy listener
+        """
+        launcher = get_obfs_launcher()
+        launcher.stop_obfs()
+
 
 class Soledad(object):
     """

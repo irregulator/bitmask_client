@@ -8,6 +8,7 @@ import os
 import random
 import subprocess
 import json
+import signal
 
 from leap.bitmask.config import flags
 from leap.bitmask.util import force_eval
@@ -16,6 +17,9 @@ logger = logging.getLogger(__name__)
 
 
 class LinuxObfsLauncher(object):
+
+    pidfile = "/tmp/obfs.pid"
+
     class OBFS_BIN_PATH(object):
         def __call__(self):
             return ("/usr/local/bin/leap-obfsproxy" if flags.STANDALONE
@@ -61,11 +65,22 @@ class LinuxObfsLauncher(object):
 
     def spawn_obfs(self, args):
         if flags.STANDALONE:
-            subprocess.Popen(args, executable=force_eval(self.OBFS_BIN_PATH))
+            op = subprocess.Popen(args,
+                    executable=force_eval(self.OBFS_BIN_PATH))
         else:
-            subprocess.Popen(args)
+            op = subprocess.Popen(args)
+
+        pid = op.pid
+        with open(self.pidfile, 'w') as f:
+            f.write(str(pid))
 
     def save_obfs_gw(self, obfs_gw, path):
         j = json.dumps(obfs_gw)
         with open(path, 'w') as f:
             f.write(j)
+
+    def stop_obfs(self):
+        with open(self.pidfile, 'r') as f:
+            pid = int(f.read())
+        os.kill(pid, signal.SIGKILL)
+        os.remove(self.pidfile)

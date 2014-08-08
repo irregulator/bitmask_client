@@ -1860,6 +1860,8 @@ class MainWindow(QtGui.QMainWindow):
 
         logger.debug('Terminating vpn')
         self._backend.eip_stop(shutdown=True)
+        logger.debug('Stopping obfsproxy')
+        self._backend.obfs_stop()
 
     def quit(self):
         """

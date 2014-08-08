@@ -335,6 +335,12 @@ class LeapBackend(Backend):
         """
         self._eip.start_obfs(domain)
 
+    def obfs_stop(self):
+        """
+        Stop obfsproxy
+        """
+        self._eip.stop_obfs()
+
     def tear_fw_down(self):
         """
         Signal the need to tear the fw down.

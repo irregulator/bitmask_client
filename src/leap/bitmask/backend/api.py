@@ -51,6 +51,7 @@ API = (
     "provider_get_supported_services",
     "provider_setup",
     "provider_get_version_configs",
+    "obfs_stop",
     "settings_set_selected_gateway",
     "smtp_start_service",
     "smtp_stop_service",
