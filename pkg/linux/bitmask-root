@@ -90,6 +90,7 @@ ALLOWED_FLAGS = {
     "--cert": ["FILE"],
     "--key": ["FILE"],
     "--ca": ["FILE"]
+    "--fragment": ["NUMBER"]
 }
 
 PARAM_FORMATS = {
