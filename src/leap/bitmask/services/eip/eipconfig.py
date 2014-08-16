@@ -217,7 +217,7 @@ class EIPConfig(ServiceConfig):
     """
     _service_name = "eip"
 
-    OPENVPN_ALLOWED_KEYS = ("auth", "cipher", "tls-cipher", "fragment")
+    OPENVPN_ALLOWED_KEYS = ("auth", "cipher", "tls-cipher", "fragment", "mssfix")
     OPENVPN_CIPHERS_REGEX = re.compile("[A-Z0-9\-]+")
 
     def __init__(self):

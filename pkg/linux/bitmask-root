@@ -91,6 +91,7 @@ ALLOWED_FLAGS = {
     "--key": ["FILE"],
     "--ca": ["FILE"]
     "--fragment": ["NUMBER"]
+    "--mssfix": ["NUMBER"]
 }
 
 PARAM_FORMATS = {
